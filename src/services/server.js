@@ -13,7 +13,7 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',          
-  password: 'PutaBarata00-',  
+  password: '****',  
   database: 'kawaru'
 });
 
@@ -38,11 +38,11 @@ app.post('/api/login', (req, res) => {
   
   const sql = "SELECT * FROM users WHERE mail = ?";
 
-  db.query(sql, [mail], async (err, res) => {
+  db.query(sql, [mail], async (err, data) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (res.lenght === 0) return res.status(400).json({ error: "El correu electrònic no existeix." });
+    if (data.lenght === 0) return res.status(400).json({ error: "El correu electrònic no existeix." });
 
-    const user = res[0];
+    const user = data[0];
     const isCorrect = await bcrypt.compare(password, user.password);
 
     if (!isCorrect) return res.status(400).json({ error: "La contrassenya és incorrecta." });

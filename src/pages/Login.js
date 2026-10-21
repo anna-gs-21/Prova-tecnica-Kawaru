@@ -36,8 +36,11 @@ function Login() {
           setShowAlert(true);
         }
       })
-      .catch((err) => setError(err.message));
-
+      .catch((err) => {
+        setAlertContent(err.message);
+        setShowAlert(true);
+      });
+      
     console.log("Email:", mail);
     console.log("Password:", password);
   };
