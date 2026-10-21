@@ -4,6 +4,7 @@ import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/materi
 
 import Login from './pages/Login.js';
 import Home from './pages/Home.js';
+import Applications from './pages/Applications.js';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/applications" element={<Applications />} />
         </Routes>
       </Container>
     </Router>

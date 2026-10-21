@@ -1,8 +1,34 @@
-import React from 'react';
+import { useEffect}  from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
 
 function Login() {
+
+  const data = {
+    name: "1",
+    company: "1",
+    mail: "1",
+    password: "1"
+  }
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data) // Enviamos los datos al backend
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          console.log(data.error);
+        }
+        else{
+          console.log("eyyy");
+        }
+      })
+    .catch((err) => setError(err.message));
+  }, []);
+
   return (
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>Home</Typography>
