@@ -35,6 +35,22 @@ app.get('/api/applications', (req, res) => {
   });
 });
 
+app.get('/api/states', (req, res) => {
+  const sql = "SELECT * FROM states";
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    return res.json(result);
+  });
+});
+
+app.get('/api/priorities', (req, res) => {
+  const sql = "SELECT * FROM priorities";
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    return res.json(result);
+  });
+});
+
 app.post('/api/company', async (req, res) => {
   const { name } = req.body;
 
@@ -65,7 +81,7 @@ app.post('/api/login', (req, res) => {
     if (!isCorrect) return res.status(400).json({ error: "La contrassenya és incorrecta." });
 
     const token = jwt.sign(
-      { id: user.id, mail: user.mail }, 
+      { id: user.id, mail: user.mail, idCompany: user.idCompany }, 
       process.env.JWT_SECRET, 
       { expiresIn: '1h' }
     );
@@ -75,6 +91,27 @@ app.post('/api/login', (req, res) => {
       token: token
     });
   });
+});
+
+app.post('/api/application', async (req, res) => {
+  const { title, description, priority, state } = req.body;
+
+  try {
+    const sql = "INSERT INTO applications (title, idCompany, description, idPriority, idState) VALUES (?, ?, ?, ?, ?)";
+
+    db.query(sql, [title, 1, description, priority, state], (err, result) => {
+    if (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({ error: "Aquesta sol·licitud ja existeix." });
+      }
+      return res.status(500).json({ error: err.message });
+    }
+    
+    return res.status(201).json({ mensaje: "Operació completada." });
+  });
+  } catch(err){
+    return res.status(500).json({ error: "Error intern." });
+  }
 });
 
 app.post('/api/register', async (req, res) => {
@@ -102,5 +139,5 @@ app.post('/api/register', async (req, res) => {
 
 
 app.listen(process.env.PORT, () => {
-  console.log(`Servidor backend corriendo en http://localhost:${process.env.PUERTO}`);
+  console.log(`Servidor backend corriendo en http://localhost:${process.env.PORT}`);
 });

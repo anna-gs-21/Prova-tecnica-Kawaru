@@ -4,50 +4,38 @@ import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/materi
 
 function Login() {
 
-  const companyData = {
-    name: "1"
-  };
-
-  const userData = {
+  const user1 = {
     name: "1",
     idCompany: 1,
     mail: "1",
     password: "1"
-  };
+  }
+
+  const user2 = {
+    name: "2",
+    idCompany: 2,
+    mail: "2",
+    password: "2"
+  }
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/company', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(companyData) // Enviamos los datos al backend
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          console.log(data.error);
-        }
-        else{
-          console.log("eyyy");
-        }
-      })
-    .catch((err) => console.log(err.message));
+    postUser(user1);
+  }, []);
 
+  const postUser = (data) => {
     fetch('http://localhost:5000/api/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData) // Enviamos los datos al backend
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          console.log(data.error);
-        }
-        else{
-          console.log("eyyy");
-        }
-      })
-    .catch((err) => console.log(err.message));
-  }, []);
+    .then(res => res.json())
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  };
 
   return (
     <Container sx={{ mt: 4 }}>

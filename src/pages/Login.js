@@ -27,14 +27,15 @@ function Login() {
     })
       .then(res => res.json())
       .then((data) => {
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-          navigate('/applications');
-        }
-        else {
+        if(data.error) {
           setAlertContent(data.error);
           setShowAlert(true);
+          return;
         }
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.user.id);
+        localStorage.setItem('companyId', data.company.id);
+        navigate('/applications');
       })
       .catch((err) => {
         setAlertContent(err.message);
