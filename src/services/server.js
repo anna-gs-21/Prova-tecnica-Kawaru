@@ -4,17 +4,19 @@ const cors = require('cors');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = "kawaru"; 
+const JWT_SECRET = process.env.JWT_SECRET; 
+
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json()); 
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',          
-  password: '****',  
-  database: 'kawaru'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,          
+  password: process.env.DB_PASSWORD,  
+  database: process.env.DB_NAME
 });
 
 db.connect((err) => {
@@ -33,6 +35,21 @@ app.get('/api/applications', (req, res) => {
   });
 });
 
+app.post('/api/company', async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    const sql = "INSERT INTO companies (name) VALUES (?)";
+
+    db.query(sql, [name], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      return res.status(201).json({ mensaje: "Operació completada." });
+    });
+  } catch(err){
+    return res.status(500).json({ error: "Error intern." });
+  }
+});
+
 app.post('/api/login', (req, res) => {
   const { mail, password } = req.body;
   
@@ -49,7 +66,7 @@ app.post('/api/login', (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, mail: user.mail }, 
-      JWT_SECRET, 
+      process.env.JWT_SECRET, 
       { expiresIn: '1h' }
     );
 
@@ -61,14 +78,14 @@ app.post('/api/login', (req, res) => {
 });
 
 app.post('/api/register', async (req, res) => {
-  const { name, company, mail, password } = req.body;
+  const { name, idCompany, mail, password } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const sql = "INSERT INTO users (name, company, mail, password) VALUES (?, ?, ?, ?)";
+    const sql = "INSERT INTO users (name, idCompany, mail, password) VALUES (?, ?, ?, ?)";
 
-    db.query(sql, [name, company, mail, hashedPassword], (err, result) => {
+    db.query(sql, [name, idCompany, mail, hashedPassword], (err, result) => {
     if (err) {
       if (err.code === 'ER_DUP_ENTRY') {
         return res.status(400).json({ error: "Aquest correu electrònic ja existeix." });
@@ -84,6 +101,6 @@ app.post('/api/register', async (req, res) => {
 });
 
 
-app.listen(5000, () => {
-  console.log('Servidor backend corriendo en http://localhost:5000');
+app.listen(process.env.PORT, () => {
+  console.log(`Servidor backend corriendo en http://localhost:${process.env.PUERTO}`);
 });

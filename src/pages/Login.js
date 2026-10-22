@@ -40,9 +40,6 @@ function Login() {
         setAlertContent(err.message);
         setShowAlert(true);
       });
-      
-    console.log("Email:", mail);
-    console.log("Password:", password);
   };
 
   return (
