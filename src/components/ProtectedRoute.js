@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-
-import {
- Box, CircularProgress 
-} from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 
 const ProtectedRoute = () => {
   const [isValidating, setIsValidating] = useState(true);
@@ -15,7 +12,7 @@ const ProtectedRoute = () => {
       setIsValidating(false);
       return;
     }
-l
+
     fetch('http://localhost:5000/api/auth/verify', {
       method: 'GET',
       headers: {

@@ -5,8 +5,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 
 import {
-  Alert,
-  AlertTitle,
   Button,
   Container,
   Dialog,
@@ -18,6 +16,7 @@ import {
   Menu,
   MenuItem,
   Select, 
+  Snackbar,
   Table, 
   TableBody, 
   TableCell, 
@@ -38,8 +37,11 @@ function Login() {
 
   const [isOpenDialog, setOpenDialog] = useState(false);
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertContent, setAlertContent] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    isOpen: false,
+    message: "",
+    color: ""
+  });  
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -69,14 +71,14 @@ function Login() {
       .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          //alert(data.error);
+          setSnackbar({ isOpen: true, message: data.error, color: "red" });
           return;
         }
-        setApplications(data);
-        setFilteredApplications(data);
+        setApplications(data.result);
+        setFilteredApplications(data.result);
       })
       .catch((err) => {
-        //alert(err);
+        setSnackbar({ isOpen: true, message: data.error, color: "red" });
       });
   }
 
@@ -91,13 +93,13 @@ function Login() {
       .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          //alert(data.error);
+          setSnackbar({ isOpen: true, message: data.error, color: "red" });
           return;
         }
-        setStates(data);
+        setStates(data.result);
       })
       .catch((err) => {
-        //alert(err);
+        setSnackbar({ isOpen: true, message: data.error, color: "red" });
       });
   };
 
@@ -112,13 +114,13 @@ function Login() {
     .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          //alert(data.error);
+          setSnackbar({ isOpen: true, message: data.error, color: "red" });
           return;
         }
-        setPriorities(data);
+        setPriorities(data.result);
       })
       .catch((err) => {
-        //alert(err);
+        setSnackbar({ isOpen: true, message: data.error, color: "red" });
       });
   };
 
@@ -146,17 +148,16 @@ function Login() {
     .then(res => res.json())
     .then((data) => {
       if(data.error) {
-        setAlertContent(data.error);
-        setShowAlert(true);
+        setSnackbar({ isOpen: true, message: data.error, color: "red" });
         return;
       }
+      setSnackbar({ isOpen: true, message: data.message, color: "green" });
       setApplications([...applications, {...newApplication, id: data.id}]);
       handleFilter(stateFilter, [...applications, {...newApplication, id: data.id}]);
       resetDialog();
     })
     .catch((err) => {
-      setAlertContent(err);
-      setShowAlert(true);
+      setSnackbar({ isOpen: true, message: data.error, color: "red" });
     });
   };
 
@@ -172,25 +173,24 @@ function Login() {
     .then(res => res.json())
     .then((data) => {
       if(data.error) {
-        //alert(data.error)
+        setSnackbar({ isOpen: true, message: data.error, color: "red" });
         return;
       }
       const newData = applications.map((a) => {
         if(a.id === selectedApplication) return {...a, idState: state}
         return a;
       });
+      setSnackbar({ isOpen: true, message: data.message, color: "green" });
       setApplications(newData);
       handleFilter(stateFilter, newData);
     })
     .catch((err) => {
-      //alert(err.message);
+      setSnackbar({ isOpen: true, message: data.error, color: "red" });
     }); 
   };
 
   const resetDialog = () => {
     setOpenDialog(false);
-    setAlertContent("");
-    setShowAlert(false);
     setTitle("");
     setDescription("");
     setPriority("");
@@ -218,64 +218,71 @@ function Login() {
   return (
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>Sol·licituds</Typography>
-      
-        <Grid container spacing={2}>
-          <Grid size={2}>
-            <Select
-              fullWidth 
-              value={stateFilter}
-              label="Estat"
-              onChange={(e) => handleFilter(e.target.value, applications)}
-            >
-              <MenuItem value={-1}>All</MenuItem>
-              {states.map((s) => (
-                <MenuItem key={s.id} value={s.id}>
-                  {s.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
-          <Grid size={4}>
-            <Button 
-              fullWidth
-              startIcon={<AddIcon />}
-              variant="contained" 
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenDialog(true)
-              }}>
-                Crear sol·licitud
-            </Button>
-          </Grid>
-          <Grid size={12}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Títol</TableCell>
-                  <TableCell>Descripció</TableCell>
-                  <TableCell>Prioritat</TableCell>
-                  <TableCell>Estat</TableCell>
-                  <TableCell>Accions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredApplications?.map((a) => (
-                  <TableRow key={a.id}>
-                    <TableCell>{a.title || "---"}</TableCell>
-                    <TableCell>{a.description || "---"}</TableCell>
-                    <TableCell>{priorities.find((p) => p.id === a.idPriority)?.name || "---"}</TableCell>
-                    <TableCell>{states.find((s) => s.id === a.idState)?.name || "---"}</TableCell>
-                    <TableCell>
-                      <IconButton onClick={(e) => handleClick(e, a.id)} > 
-                        <EditIcon /> 
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Grid>
+      <Snackbar
+        open={snackbar.isOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({...snackbar, isOpen: false})}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
+        message={snackbar.message}
+        slotProps={{ content: { sx: { backgroundColor: snackbar.color }}}}
+      />
+      <Grid container spacing={2}>
+        <Grid size={2}>
+          <Select
+            fullWidth 
+            value={stateFilter}
+            label="Estat"
+            onChange={(e) => handleFilter(e.target.value, applications)}
+          >
+            <MenuItem value={-1}>All</MenuItem>
+            {states.map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.name}
+              </MenuItem>
+            ))}
+          </Select>
         </Grid>
+        <Grid size={4}>
+          <Button 
+            fullWidth
+            startIcon={<AddIcon />}
+            variant="contained" 
+            onClick={(e) => {
+              e.preventDefault();
+              setOpenDialog(true)
+            }}>
+              Crear sol·licitud
+          </Button>
+        </Grid>
+        <Grid size={12}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Títol</TableCell>
+                <TableCell>Descripció</TableCell>
+                <TableCell>Prioritat</TableCell>
+                <TableCell>Estat</TableCell>
+                <TableCell>Accions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredApplications?.map((a) => (
+                <TableRow key={a.id}>
+                  <TableCell>{a.title || "---"}</TableCell>
+                  <TableCell>{a.description || "---"}</TableCell>
+                  <TableCell>{priorities.find((p) => p.id === a.idPriority)?.name || "---"}</TableCell>
+                  <TableCell>{states.find((s) => s.id === a.idState)?.name || "---"}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={(e) => handleClick(e, a.id)} > 
+                      <EditIcon /> 
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Grid>
+      </Grid>
 
         <Menu
           anchorEl={anchorEl}
@@ -307,14 +314,6 @@ function Login() {
           </IconButton>
           <DialogContent>
             <Grid container spacing={2}>
-              {showAlert && (
-                <Grid size={12}>
-                  <Alert severity="error">
-                    <AlertTitle>Error</AlertTitle>
-                    {alertContent}
-                  </Alert>
-                </Grid>
-              )}
               <Grid size={12}>
                 <TextField 
                   required 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, AlertTitle, Typography, Button, Container, TextField, Grid } from '@mui/material';
+import { Button, Container, Grid, Snackbar, TextField, Typography } from '@mui/material';
 
 function Login() {
   const navigate = useNavigate();
@@ -8,15 +8,21 @@ function Login() {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertContent, setAlertContent] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    isOpen: false,
+    message: "",
+    color: ""
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if(mail === "" || password === "") {
-      setAlertContent("No están tots els camps obligatoris omplerts.");
-      setShowAlert(true);
+      setSnackbar({
+        isOpen: true,
+        message: "Error: faltan camps obligatoris",
+        color: "red"
+      });
       return;
     }
 
@@ -28,34 +34,35 @@ function Login() {
       .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          setAlertContent(data.error);
-          setShowAlert(true);
+          setSnackbar({ isOpen: true, message: data.error, color: "red" });
           return;
         }
+
+        setSnackbar({ isOpen: true, message: data.message, color: "red"});
+
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('companyId', data.user.idCompany);
+        
         navigate('/applications');
       })
       .catch((err) => {
-        setAlertContent(err.message);
-        setShowAlert(true);
+        setSnackbar({ isOpen: true, message: err, color: "red" });
       });
   };
 
   return (
     <Container sx={{ mt: 4 }} >
       <Typography variant="h4" gutterBottom>Iniciar sessió</Typography>
-
+      <Snackbar
+        open={snackbar.isOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({...snackbar, isOpen: false})}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
+        message={snackbar.message}
+        slotProps={{ content: { sx: { backgroundColor: snackbar.color }}}}
+      />
       <Grid container spacing={2}>
-        {showAlert && (
-          <Grid size={12}>
-            <Alert severity="error">
-              <AlertTitle>Error</AlertTitle>
-              {alertContent}
-            </Alert>
-          </Grid>
-        )}
         <Grid size={12}>
           <TextField 
             required 
