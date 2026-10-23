@@ -42,6 +42,10 @@ const authCheck = (req, res, next) => {
   }
 };
 
+app.get('/api/auth/verify', authCheck, (req, res) => {
+  return res.status(200).json({ valido: true });
+});
+
 app.get('/api/applications', authCheck, (req, res) => {
   const sql = "SELECT * FROM applications WHERE idCompany = ?";
   db.query(sql, [req.user.idCompany], (err, result) => {

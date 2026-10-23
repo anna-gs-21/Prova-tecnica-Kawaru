@@ -69,14 +69,14 @@ function Login() {
       .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          alert(data.error);
+          //alert(data.error);
           return;
         }
         setApplications(data);
         setFilteredApplications(data);
       })
       .catch((err) => {
-        alert(err);
+        //alert(err);
       });
   }
 
@@ -91,13 +91,13 @@ function Login() {
       .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          alert(data.error);
+          //alert(data.error);
           return;
         }
         setStates(data);
       })
       .catch((err) => {
-        alert(err);
+        //alert(err);
       });
   };
 
@@ -112,13 +112,13 @@ function Login() {
     .then(res => res.json())
       .then((data) => {
         if(data.error) {
-          alert(data.error);
+          //alert(data.error);
           return;
         }
         setPriorities(data);
       })
       .catch((err) => {
-        alert(err);
+        //alert(err);
       });
   };
 
@@ -172,7 +172,7 @@ function Login() {
     .then(res => res.json())
     .then((data) => {
       if(data.error) {
-        alert(data.error)
+        //alert(data.error)
         return;
       }
       const newData = applications.map((a) => {
@@ -183,7 +183,7 @@ function Login() {
       handleFilter(stateFilter, newData);
     })
     .catch((err) => {
-      alert(err.message);
+      //alert(err.message);
     }); 
   };
 
