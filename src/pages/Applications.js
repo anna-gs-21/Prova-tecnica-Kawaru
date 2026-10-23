@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
 
 import {
   Alert,
@@ -14,9 +15,11 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  Menu,
   MenuItem,
   Select, 
   Table, 
+  TableBody, 
   TableCell, 
   TableHead, 
   TableRow, 
@@ -25,6 +28,11 @@ import {
 } from '@mui/material';
 
 function Login() {
+  const token = localStorage.getItem('token');
+
+  const [applications, setApplications] = useState([]);
+  const [filteredApplications, setFilteredApplications] = useState([]);
+
   const [priorities, setPriorities] = useState([]);
   const [states, setStates] = useState([]);
 
@@ -38,27 +46,58 @@ function Login() {
   const [priority, setPriority] = useState("");
   const [state, setState] = useState("");
 
-  const [stateFilter, setStateFilter] = useState("");
+  const [stateFilter, setStateFilter] = useState(-1);
+
+  const [anchorEl, setAnchorEl] =useState(null);
+  const [selectedApplication, setSelectedApplication] =useState(null);
+  const open = anchorEl;
 
   useEffect(() => {
     getStates();
     getPriorities();
+    getApplications();
   }, []);
+
+  const getApplications = () => {
+    fetch('http://localhost:5000/api/applications', {
+      method: 'GET',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    })
+      .then(res => res.json())
+      .then((data) => {
+        if(data.error) {
+          alert(data.error);
+          return;
+        }
+        setApplications(data);
+        setFilteredApplications(data);
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  }
 
   const getStates = () => {
     fetch('http://localhost:5000/api/states', {
       method: 'GET',
       headers: { 
         'Content-Type': 'application/json',
-        //'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`
       },
     })
       .then(res => res.json())
-      .then((data) => setStates(data))
+      .then((data) => {
+        if(data.error) {
+          alert(data.error);
+          return;
+        }
+        setStates(data);
+      })
       .catch((err) => {
-        console.log(err);
-        //setAlertContent(err.message);
-        //setShowAlert(true);
+        alert(err);
       });
   };
 
@@ -67,35 +106,42 @@ function Login() {
       method: 'GET',
       headers: { 
         'Content-Type': 'application/json',
-        //'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`
       },
     })
-      .then(res => res.json())
-      .then((data) => setPriorities(data))
+    .then(res => res.json())
+      .then((data) => {
+        if(data.error) {
+          alert(data.error);
+          return;
+        }
+        setPriorities(data);
+      })
       .catch((err) => {
-        console.log(err);
-        //setAlertContent(err.message);
-        //setShowAlert(true);
+        alert(err);
       });
   };
 
   const postApplication = () => {
     if(title === "") {
       setAlertContent("No están tots els camps obligatoris omplerts.");
-      setShowAlert(false);
+      setShowAlert(true);
     }
 
-    const data = {
+    const newApplication = {
       title: title,
       description: description,
-      priority: priority,
-      state: state
+      idPriority: priority,
+      idState: state
     };
 
     fetch('http://localhost:5000/api/application', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(newApplication)
     })
     .then(res => res.json())
     .then((data) => {
@@ -104,22 +150,69 @@ function Login() {
         setShowAlert(true);
         return;
       }
+      setApplications([...applications, {...newApplication, id: data.id}]);
+      handleFilter(stateFilter, [...applications, {...newApplication, id: data.id}]);
       resetDialog();
     })
     .catch((err) => {
-      setAlertContent(err.message);
+      setAlertContent(err);
       setShowAlert(true);
     });
-  }
+  };
+
+  const patchApplication = (state) => {
+    fetch(`http://localhost:5000/api/application/${selectedApplication}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ idState: state })
+    })
+    .then(res => res.json())
+    .then((data) => {
+      if(data.error) {
+        alert(data.error)
+        return;
+      }
+      const newData = applications.map((a) => {
+        if(a.id === selectedApplication) return {...a, idState: state}
+        return a;
+      });
+      setApplications(newData);
+      handleFilter(stateFilter, newData);
+    })
+    .catch((err) => {
+      alert(err.message);
+    }); 
+  };
 
   const resetDialog = () => {
-    isOpenDialog(false);
+    setOpenDialog(false);
     setAlertContent("");
     setShowAlert(false);
     setTitle("");
     setDescription("");
     setPriority("");
     setState("");
+  };
+
+  const handleFilter = (value, data) => {
+    setStateFilter(value);
+    if(value < 0) {
+      setFilteredApplications(data);
+      return;
+    }
+    setFilteredApplications(data.filter((a) => a.idState === value));
+  };
+
+  const handleClick = (e, id) => {
+    setAnchorEl(e.currentTarget);
+    setSelectedApplication(id);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -132,8 +225,9 @@ function Login() {
               fullWidth 
               value={stateFilter}
               label="Estat"
-              onChange={(e) => setStateFilter(e.target.value)}
+              onChange={(e) => handleFilter(e.target.value, applications)}
             >
+              <MenuItem value={-1}>All</MenuItem>
               {states.map((s) => (
                 <MenuItem key={s.id} value={s.id}>
                   {s.name}
@@ -158,14 +252,42 @@ function Login() {
               <TableHead>
                 <TableRow>
                   <TableCell>Títol</TableCell>
-                  <TableCell align="right">Descripció</TableCell>
-                  <TableCell align="right">Prioritat</TableCell>
-                  <TableCell align="right">Estat</TableCell>
+                  <TableCell>Descripció</TableCell>
+                  <TableCell>Prioritat</TableCell>
+                  <TableCell>Estat</TableCell>
+                  <TableCell>Accions</TableCell>
                 </TableRow>
               </TableHead>
+              <TableBody>
+                {filteredApplications?.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell>{a.title || "---"}</TableCell>
+                    <TableCell>{a.description || "---"}</TableCell>
+                    <TableCell>{priorities.find((p) => p.id === a.idPriority)?.name || "---"}</TableCell>
+                    <TableCell>{states.find((s) => s.id === a.idState)?.name || "---"}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={(e) => handleClick(e, a.id)} > 
+                        <EditIcon /> 
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
             </Table>
           </Grid>
         </Grid>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          {states.map((s) => (
+            <MenuItem key={s.id} value={s.id} onClick={() => patchApplication(s.id)}>
+              {s.name}
+            </MenuItem>
+          ))}
+        </Menu>
 
         <Dialog
           onClose={() => resetDialog()} 

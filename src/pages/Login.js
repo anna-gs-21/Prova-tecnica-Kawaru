@@ -34,7 +34,7 @@ function Login() {
         }
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.user.id);
-        localStorage.setItem('companyId', data.company.id);
+        localStorage.setItem('companyId', data.user.idCompany);
         navigate('/applications');
       })
       .catch((err) => {

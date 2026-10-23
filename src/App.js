@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
+
+import ProtectedRoute from './components/ProtectedRoute.js';
 
 import Login from './pages/Login.js';
 import Home from './pages/Home.js';
@@ -24,7 +26,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/applications" element={<Applications />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/applications" element={<Applications />} />
+          </Route>
         </Routes>
       </Container>
     </Router>
