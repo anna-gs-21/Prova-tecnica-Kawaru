@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Container, Grid, Snackbar, TextField, Typography } from '@mui/material';
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
 
   const [mail, setMail] = useState("");
@@ -44,6 +44,7 @@ function Login() {
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('companyId', data.user.idCompany);
         
+        onLoginSuccess(); 
         navigate('/applications');
       })
       .catch((err) => {
