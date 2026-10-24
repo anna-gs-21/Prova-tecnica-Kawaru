@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import {
   Button,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -36,6 +37,7 @@ function Login() {
   const [states, setStates] = useState([]);
 
   const [isOpenDialog, setOpenDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [snackbar, setSnackbar] = useState({
     isOpen: false,
@@ -44,9 +46,9 @@ function Login() {
   });  
 
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("");
-  const [state, setState] = useState("");
+  const [description, setDescription] = useState(null);
+  const [priority, setPriority] = useState(null);
+  const [state, setState] = useState(null);
 
   const [stateFilter, setStateFilter] = useState(-1);
 
@@ -76,6 +78,7 @@ function Login() {
         }
         setApplications(data.result);
         setFilteredApplications(data.result);
+        setIsLoading(false);
       })
       .catch((err) => {
         setSnackbar({ isOpen: true, message: err, color: "red" });
@@ -258,6 +261,7 @@ function Login() {
           </Button>
         </Grid>
         <Grid size={12}>
+          {isLoading ? (<CircularProgress aria-label="Loading…" />) : (
           <Table>
             <TableHead>
               <TableRow>
@@ -284,7 +288,9 @@ function Login() {
               ))}
             </TableBody>
           </Table>
+          )}
         </Grid>
+        
       </Grid>
 
         <Menu

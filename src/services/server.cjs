@@ -4,7 +4,6 @@ const cors = require('cors');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET; 
 
 require('dotenv').config();
 
@@ -24,10 +23,6 @@ db.connect((err) => {
     console.error('Error conectando a la base de datos:', err);
     return;
   }
-  console.log('Conectado exitosamente a MySQL local');
-  db.query("SHOW TABLES", (err, result) => {
-    console.log("Tablas creadas en Docker actualmente:", result);
-  });
 });
 
 const authCheck = (req, res, next) => {
