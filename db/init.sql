@@ -60,7 +60,5 @@ INSERT INTO states (name) VALUES ("Oberta");
 INSERT INTO states (name) VALUES ("En curs");
 INSERT INTO states (name) VALUES ("Tancada");
 
-INSERT INTO companies (name) VALUES ("Empresa 1");
-INSERT INTO companies (name) VALUES ("Empresa 2");
-
-/*INSERT INTO Users (name, idCompany, mail, password) VALUES ("1", 1, "1", );*/
+INSERT INTO companies (name) VALUES ("Empresa A");
+INSERT INTO companies (name) VALUES ("Empresa B");

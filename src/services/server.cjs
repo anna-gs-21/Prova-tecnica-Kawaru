@@ -23,7 +23,37 @@ db.connect((err) => {
     console.error('Error conectando a la base de datos:', err);
     return;
   }
+
+  createUsers();
 });
+
+const createUsers = () => {
+  const users = [
+    { name: "Usuario 1A", idCompany: 1, mail: "user1a@company1.com", password: "1" },
+    { name: "Usuario 1B", idCompany: 1, mail: "user1b@company1.com", password: "1" },
+    { name: "Usuario 2A", idCompany: 2, mail: "user2a@company2.com", password: "1" },
+    { name: "Usuario 2B", idCompany: 2, mail: "user2b@company2.com", password: "1" }
+  ];
+
+  users.forEach((u) => {
+    try{
+      db.query("SELECT id FROM users WHERE mail = ?", [u.mail], async (err, rows) => {
+        if (err) return console.error("Error: ", err.message);
+
+        if (rows.length === 0) {
+          const sql = "INSERT INTO users (name, idCompany, mail, password) VALUES (?, ?, ?, ?)";
+          const hashedPassword = await bcrypt.hash(u.password, 10);
+
+          db.query(sql, [u.name, u.idCompany, u.mail, hashedPassword], (insertErr) => {
+            if (insertErr) console.error(`Error:`, insertErr.message);
+          });
+        }
+      });
+    } catch(err) {
+      console.error('Error creando usuarios: ', err);
+    }
+  });
+};
 
 const authCheck = (req, res, next) => {
   const authHeader = req.headers['authorization'];
