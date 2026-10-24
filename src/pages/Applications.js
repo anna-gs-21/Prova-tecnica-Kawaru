@@ -134,6 +134,7 @@ function Login() {
         message: "Error: faltan camps obligatoris",
         color: "red"
       });
+      return;
     }
 
     const newApplication = {
