@@ -224,6 +224,34 @@ function Login() {
     setAnchorEl(null);
   };
 
+  const exportCSV = () => {
+    const headers = ["Titol", "Descripcio", "Prioritat", "Estat"];
+
+    const rows = filteredApplications.map((a) => {
+      const priority = priorities.find((p) => p.id === a.idPriority)?.name;
+      const state = states.find((s) => s.id === a.idState)?.name;
+
+      return [
+        `"${(a.title || "---")}"`,
+        `"${(a.description || "---")}"`,
+        `"${priority || "---"}"`,
+        `"${state || "---"}"`
+      ];
+    });
+
+    const csvContent = [headers.join(";"), ...rows.map(e => e.join(";"))].join("\n");
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `solicituds_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>Sol·licituds</Typography>
@@ -251,6 +279,17 @@ function Login() {
             ))}
           </Select>
         </Grid>
+         <Grid size={4}>
+          <Button 
+            fullWidth
+            variant="contained" 
+            onClick={(e) => {
+              e.preventDefault();
+              exportCSV();
+            }}>
+              Exportar CSV
+          </Button>
+        </Grid>
         <Grid size={4}>
           <Button 
             fullWidth
@@ -258,7 +297,7 @@ function Login() {
             variant="contained" 
             onClick={(e) => {
               e.preventDefault();
-              setOpenDialog(true)
+              setOpenDialog(true);
             }}>
               Crear sol·licitud
           </Button>
