@@ -14,6 +14,7 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  InputLabel,
   Menu,
   MenuItem,
   Select, 
@@ -200,8 +201,8 @@ function Login() {
     setOpenDialog(false);
     setTitle("");
     setDescription("");
-    setPriority("");
-    setState("");
+    setPriority(null);
+    setState(null);
   };
 
   const handleFilter = (value, data) => {
@@ -342,12 +343,13 @@ function Login() {
                 />
               </Grid>
               <Grid size={6}>
+                <InputLabel>Prioritat</InputLabel> 
                 <Select
                   fullWidth 
                   value={priority}
-                  label="Prioritat"
                   onChange={(e) => setPriority(e.target.value)}
                 >
+                  <MenuItem value={null}>Sense seleccionar</MenuItem>
                   {priorities.map((p) => (
                     <MenuItem key={p.id} value={p.id}>
                       {p.name}
@@ -356,12 +358,13 @@ function Login() {
                 </Select>
               </Grid>
               <Grid size={6}>
+                <InputLabel>Estat</InputLabel> 
                 <Select
                   fullWidth 
                   value={state}
-                  label="Estat"
                   onChange={(e) => setState(e.target.value)}
                 >
+                  <MenuItem value={null}>Sense seleccionar</MenuItem>
                   {states.map((s) => (
                     <MenuItem key={s.id} value={s.id}>
                       {s.name}
