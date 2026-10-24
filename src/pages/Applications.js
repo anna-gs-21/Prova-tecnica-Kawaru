@@ -78,7 +78,7 @@ function Login() {
         setFilteredApplications(data.result);
       })
       .catch((err) => {
-        setSnackbar({ isOpen: true, message: data.error, color: "red" });
+        setSnackbar({ isOpen: true, message: err, color: "red" });
       });
   }
 
@@ -99,7 +99,7 @@ function Login() {
         setStates(data.result);
       })
       .catch((err) => {
-        setSnackbar({ isOpen: true, message: data.error, color: "red" });
+        setSnackbar({ isOpen: true, message: err, color: "red" });
       });
   };
 
@@ -120,14 +120,17 @@ function Login() {
         setPriorities(data.result);
       })
       .catch((err) => {
-        setSnackbar({ isOpen: true, message: data.error, color: "red" });
+        setSnackbar({ isOpen: true, message: err, color: "red" });
       });
   };
 
   const postApplication = () => {
     if(title === "") {
-      setAlertContent("No están tots els camps obligatoris omplerts.");
-      setShowAlert(true);
+      setSnackbar({
+        isOpen: true,
+        message: "Error: faltan camps obligatoris",
+        color: "red"
+      });
     }
 
     const newApplication = {
@@ -157,7 +160,7 @@ function Login() {
       resetDialog();
     })
     .catch((err) => {
-      setSnackbar({ isOpen: true, message: data.error, color: "red" });
+      setSnackbar({ isOpen: true, message: err, color: "red" });
     });
   };
 
@@ -185,7 +188,7 @@ function Login() {
       handleFilter(stateFilter, newData);
     })
     .catch((err) => {
-      setSnackbar({ isOpen: true, message: data.error, color: "red" });
+      setSnackbar({ isOpen: true, message: err, color: "red" });
     }); 
   };
 

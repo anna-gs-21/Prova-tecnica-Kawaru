@@ -25,6 +25,9 @@ db.connect((err) => {
     return;
   }
   console.log('Conectado exitosamente a MySQL local');
+  db.query("SHOW TABLES", (err, result) => {
+    console.log("Tablas creadas en Docker actualmente:", result);
+  });
 });
 
 const authCheck = (req, res, next) => {
