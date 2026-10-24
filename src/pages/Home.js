@@ -1,7 +1,7 @@
 import { useEffect}  from 'react';
 import { Typography, Container } from '@mui/material';
 
-function Login() {
+function Home() {
 
   const user1 = {
     name: "1",
@@ -44,4 +44,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Home;
