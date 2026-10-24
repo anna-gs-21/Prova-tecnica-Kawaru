@@ -191,6 +191,7 @@ function Login() {
       setSnackbar({ isOpen: true, message: data.message, color: "green" });
       setApplications(newData);
       handleFilter(stateFilter, newData);
+      handleClose();
     })
     .catch((err) => {
       setSnackbar({ isOpen: true, message: err, color: "red" });
