@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS states (
 
 CREATE TABLE IF NOT EXISTS applications (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(255) UNIQUE,
+    title VARCHAR(255) NOT NULL UNIQUE,
     idCompany INT NOT NULL,
     description VARCHAR(255),
     idPriority INT,

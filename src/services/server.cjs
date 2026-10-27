@@ -59,14 +59,14 @@ const authCheck = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.status(401).json({ error: "Error: accés denegat" });
+  if (!token) return res.status(400).json({ error: "Error: accés denegat" });
 
   try {
     const verificado = jwt.verify(token, process.env.JWT_SECRET);
     req.user = verificado;
     next();
   } catch (error) {
-    return res.status(403).json({ error: "Error: token invàlid o expirat" });
+    return res.status(400).json({ error: "Error: token invàlid o expirat" });
   }
 };
 
@@ -80,7 +80,7 @@ app.get('/api/applications', authCheck, (req, res) => {
 
     db.query(sql, [req.user.idCompany], (err, result) => {
       if (err) return res.status(500).json({ error: "Error: " + err.message });
-      return res.json({result, message: "Éxit"});
+      return res.status(200).json({result, message: "Éxit"});
     });
   } catch(err){
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -93,7 +93,7 @@ app.get('/api/states', authCheck, (req, res) => {
 
     db.query(sql, (err, result) => {
       if (err) return res.status(500).json({ error: "Error: " + err.message });
-      return res.json({result, message: "Éxit"});
+      return res.status(200).json({result, message: "Éxit"});
     });
   } catch(err) {
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -106,7 +106,7 @@ app.get('/api/priorities', authCheck, (req, res) => {
 
     db.query(sql, (err, result) => {
       if (err) return res.status(500).json({ error: "Error: " + err.message });
-      return res.json({result, message: "Éxit"});
+      return res.status(200).json({result, message: "Éxit"});
     });
   } catch(err) {
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -121,7 +121,7 @@ app.post('/api/company', async (req, res) => {
 
     db.query(sql, [name], (err, result) => {
       if (err) return res.status(500).json({ error: "Error: " + err.message });
-      return res.status(201).json({ message: "Éxit: s'ha creat l'empresa" });
+      return res.status(200).json({ message: "Éxit: s'ha creat l'empresa" });
     });
   } catch(err){
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -177,7 +177,7 @@ app.post('/api/application', authCheck, async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     
-    return res.status(201).json({ message: "Éxit: sol·licitud completada", id: result.insertId });
+    return res.status(200).json({ message: "Éxit: sol·licitud completada", id: result.insertId });
   });
   } catch(err){
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -196,10 +196,15 @@ app.post('/api/register', async (req, res) => {
       if (err.code === 'ER_DUP_ENTRY') {
         return res.status(400).json({ error: "Error: aquest correu electrònic ja existeix" });
       }
+      
       return res.status(500).json({ error: err.message });
     }
     
-    return res.status(201).json({ message: "Éxit: usuari creat" });
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ error: "Error: No tens permisos" });
+    }
+    
+    return res.status(200).json({ message: "Éxit: usuari creat" });
   });
   } catch(err){
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -209,16 +214,20 @@ app.post('/api/register', async (req, res) => {
 app.patch('/api/application/:id/status', authCheck, async (req, res) => {
    try {
      const { id } = req.params;
-    const { idState } = req.body;
+      const { idState } = req.body;
 
-    const sql = "UPDATE applications SET idState = ? WHERE id = ?";
+    const sql = "UPDATE applications SET idState = ? WHERE id = ? AND idCompany = ?";
 
-    db.query(sql, [idState, id], (err, result) => {
+    db.query(sql, [idState, id, req.user.idCompany], (err, result) => {
     if (err) {
       return res.status(500).json({ error: "Error: "+ err.message });
     }
+   
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ error: "Error: No tens permisos" });
+    }
     
-    return res.status(201).json({ message: "Éxit: estat canviat" });
+    return res.status(200).json({ message: "Éxit: estat canviat" });
   });
   } catch(err){
     return res.status(500).json({ error: "Error: parla amb l'administrador" });
@@ -228,3 +237,5 @@ app.patch('/api/application/:id/status', authCheck, async (req, res) => {
 app.listen(process.env.PORT, () => {
   console.log(`Servidor backend corriendo en http://localhost:${process.env.PORT}`);
 });
+
+module.exports = app;
