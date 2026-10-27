@@ -21,11 +21,16 @@ Al ser una aplicació petita, tant el frontend, com el backend estan en un matei
 # Desenvolupament
 
 L’autenticació està feta amb JWT. He escollit aquest mètode per gestionar les sessions dels usuaris perquè és un dels més utilitzats. I el xifratge de la contrasenya amb bcrypt, els avantatges de bcrypt són les següents:
+
 * Una vegada es fa el hashing, és impossible revertir-lo.
 * Encara que hi hagi dues contrasenyes idèntiques, els hash seran totalment diferents.
+
 El filtre d’estat es fa en el frontend perquè només és un i no és gaire complicat. En el cas que hi hagi molts filtres i es compliqui la seva gestió, faria una crida al backend per fer una sentència SQL.
+
 La primera vegada que construeixes el docker del backend, s’executa un script SQL que crea la base de dades, les taules i insereix unes dades bàsiques. S’ha fet d’aquesta forma per unificar tot i que no s’hagi de fer res per poder començar a utilitzar l’aplicació.
+
 Els tres tests automatitzats que he fet tenen a veure amb la seguretat i la separació entre empreses perquè és el punt més crític i sensible de l’aplicació.
+
 L’eina d’intel·ligència artificial que he utilitzat per consultes i suport puntual ha sigut Gemini.
 Desplegament
 
@@ -86,15 +91,20 @@ volumes:
 ```
 
 Quan estigui tot llest, s’han de seguir aquests comandaments per iniciar l’aplicació:
+
 1 Desplegar la base de dades amb docker: docker compose up mysql_db --build.
 2 Desplegar el backend amb docker en un altre terminal: docker compose up backend_node --build.
 3 Instal·lar les dependències en un altre terminal: npm install.
 4 Iniciar el frontend: npm start.
+
 Es fa en tres comandaments per donar temps a que la base de dades es desplegui bé. El procés tarda una mica a fer-se i si desplegues el backend molt ràpid i la base de dades encara no està, falla.
 
 # Hores dedicades i conclusió 
 
 En total he dedicat unes 15 hores en el desenvolupament. He trigat més del que esperava perquè, encara que ja havia treballat anteriorment amb aplicacions similars, mai havia fet una completament des de zero, així que hi ha hagut aspectes que he investigat i après sobre la marxa.
+
 En un futur i amb més temps, m’agradaria acabar de profunditzar el funcionament de jest per fer tests més polits i interessants, ja que aquest és un dels aspectes que he après mentre realitzava la prova. Per exemple, les sol·licituds que es creen per fer els tests, no s’eliminen automàticament.
+
 També m’agradaria separar el frontend i el backend en dos projectes independents i desplegar el frontend amb el seu propi contenidor.
+
 Per l’altra banda, he intentat afegir tots els elements possibles que ajudin a l’experiència de l’usuari. Però segur que s’hi poden posar més per millorar la qualitat de l’aplicació.
