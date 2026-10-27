@@ -46,7 +46,7 @@ describe('Seguridad entre empresas', () => {
 
   test('DEBE denegar la modificación de una solicitud si no pertenece a tu empresa', async () => {
     const response = await request(app)
-      .patch('/api/application/2/status') 
+      .patch('/api/application/3/status') 
       .set('Authorization', `Bearer ${token}`)
       .send({ idState: 2 });
 
