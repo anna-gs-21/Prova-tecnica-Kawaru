@@ -41,6 +41,7 @@ Per poder executar l’aplicació, es necessita tenir Docker Compose instal·lat
 
 ```
 // .env
+
 PORT=5000
 DB_HOST=mysql_db
 DB_USER=root
@@ -52,8 +53,8 @@ JWT_SECRET=
 
 ```
 // docker-compose.yaml
-version: '3.8'
 
+version: '3.8'
 
 services:
   mysql_db:
