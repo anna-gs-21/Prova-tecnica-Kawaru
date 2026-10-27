@@ -265,10 +265,10 @@ function Login() {
       />
       <Grid container spacing={2}>
         <Grid size={2}>
+          <InputLabel>Filtrar per l'estat</InputLabel> 
           <Select
             fullWidth 
             value={stateFilter}
-            label="Estat"
             onChange={(e) => handleFilter(e.target.value, applications)}
           >
             <MenuItem value={-1}>All</MenuItem>
